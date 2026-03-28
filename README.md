@@ -1,151 +1,88 @@
+# OWASP DIVA on Modern Android Studio (2026 Fix Guide)
 
-# Running OWASP DIVA from Source on Modern Android Studio (2026 Guide)
+This repository provides a fully working build of OWASP DIVA on modern Android Studio, including fixes for AndroidX migration, Gradle compatibility, and emulator configuration.
 
-This guide explains how to successfully build and run OWASP DIVA (Damn Insecure and Vulnerable App) from source code on a modern Android Studio environment.
+## Overview
+OWASP DIVA (Damn Insecure and Vulnerable App) is an intentionally vulnerable Android application used for learning mobile penetration testing and reverse engineering.
 
----
-
-# 1. Requirements
-
-Install:
-
-- Android Studio (latest)
-- Android SDK
-- Java 17+
-- Android Emulator
-
-Recommended emulator:
-
-Device: Pixel 3  
-Android Version: Android 9 (API 28)
+The original project is very old and does not build on modern Android Studio. This project fixes those issues and documents the full build process.
 
 ---
 
-# 2. Download DIVA Source
+## Environment
 
-https://github.com/payatu/diva-android
+| Component | Version |
+|----------|--------|
+| Android Studio | 2024+ |
+| Gradle | 8.x |
+| Android Gradle Plugin | 8.x |
+| Java | 17 |
+| Emulator | Pixel 3 |
+| Android Version | API 28 |
 
-Open in Android Studio.
-
----
-
-# 3. Fix Gradle / Java Compatibility
-
-Use:
-
-Gradle: 8.5+  
-Android Gradle Plugin: 8.2.x  
-Java: 17
+API 28 emulator is recommended for compatibility.
 
 ---
 
-# 4. Fix Android 12 Manifest Requirement
+## Fixes Applied
 
-Add exported flag in AndroidManifest.xml:
+### 1. AndroidX Migration
+Replaced old support libraries:
+- android.support.v7 → androidx.appcompat
+- android.support.design → com.google.android.material
 
-android:exported="true"
+### 2. Layout Fix
+Replaced:
+- android.support.design.widget.CoordinatorLayout → androidx.coordinatorlayout.widget.CoordinatorLayout
+- android.support.design.widget.AppBarLayout → com.google.android.material.appbar.AppBarLayout
 
-for activities with intent filters.
+### 3. Added Dependencies
 
----
+Add to app/build.gradle:
 
-# 5. Migrate Support Library → AndroidX
-
-Replace:
-
-android.support.v7.app.AppCompatActivity
-
-with
-
-androidx.appcompat.app.AppCompatActivity
-
-Replace design widgets:
-
-android.support.design.widget.*
-
-with
-
-com.google.android.material.*
-
----
-
-# 6. Fix Layout XML
-
-Replace:
-
-android.support.design.widget.CoordinatorLayout
-
-with
-
-androidx.coordinatorlayout.widget.CoordinatorLayout
-
-Replace:
-
-android.support.design.widget.AppBarLayout
-
-with
-
-com.google.android.material.appbar.AppBarLayout
-
----
-
-# 7. Add Dependency
-
-In app/build.gradle:
-
+```
 implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
 implementation 'androidx.appcompat:appcompat:1.6.1'
 implementation 'com.google.android.material:material:1.11.0'
+```
+
+### 4. Android 12 Exported Fix
+Added:
+```
+android:exported="true"
+```
+to activities with intent filters.
+
+### 5. Removed Old Tests
+Deleted deprecated androidTest folder.
 
 ---
 
-# 8. Remove Old Test Files
-
-Delete:
-
-app/src/androidTest/
-
----
-
-# 9. Build
+## Build APK
 
 Build → Rebuild Project
 
----
-
-# 10. APK Location
-
+APK location:
+```
 app/build/outputs/apk/debug/app-debug.apk
+```
 
 ---
 
-# 11. Create Emulator
+## Run Emulator
 
-Device Manager → Pixel 3 → API 28
+Create emulator:
+- Pixel 3
+- Android 9 (API 28)
 
----
-
-# 12. Install APK
-
-adb install -r app/build/outputs/apk/debug/app-debug.apk
-
----
-
-# 13. Launch DIVA
-
-Open Diva in emulator.
-
-You should see vulnerabilities:
-
-- Insecure Logging
-- Hardcoding Issues
-- Insecure Storage
-- Input Validation
-- Access Control
+Install APK:
+```
+adb install -r app-debug.apk
+```
 
 ---
 
-# Useful Debug Command
 
-adb logcat AndroidRuntime:E ActivityManager:E *:S
-
+## Credits
+Original OWASP DIVA:
+https://github.com/payatu/diva-android
